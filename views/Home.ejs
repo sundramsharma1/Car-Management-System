@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Collection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        .form-container, .table-container {
+            width: 80%;
+            max-width: 1200px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-container h2, .table-container h2 {
+            text-align: center;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            margin: 10px;
+        }
+        .form-group label {
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        .form-row {
+            display: flex;
+            justify-content: space-between;
+        }
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 3px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        .action-btn {
+            padding: 5px 10px;
+            font-size: 14px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+        .edit-btn {
+            background-color: #008CBA;
+            color: white;
+        }
+        .delete-btn {
+            background-color: #f44336;
+            color: white;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="form-container">
+            <h2>Car Collection</h2>
+            <form action="/Home" method="post">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name">Car Name</label>
+                        <input type="text" id="name" name="name" placeholder="Enter car name" required autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="model">Model</label>
+                        <input type="number" id="model" name="model" placeholder="Enter model" required autocomplete="off">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="price">Price</label>
+                        <input type="number" id="price" name="price" placeholder="Enter price" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="manufacturing-year">Manufacturing Year</label>
+                        <input type="number" id="manufactureYear" name="manufactureYear" placeholder="Enter manufacturing year" required>
+                    </div>
+                </div>
+                <button type="submit" class="submit-btn">Submit</button>
+            </form>
+        </div>
+            </form>
+        </div>
+        </form>
+    </div>
+    <div class="table-container">
+        <h2>Car Collection Dashboard</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Car Name</th>
+                    <th scope="col">Model</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Manufacturing Year</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% cars.forEach((car, index) => { %>
+                    <tr id="car-<%= car._id %>">
+                        <td><%= index + 1 %></td>
+                        <td><input type="text" value="<%= car.name %>" id="name-<%= car._id %>" disabled></td>
+                        <td><input type="number" value="<%= car.model %>" id="model-<%= car._id %>" disabled></td>
+                        <td><input type="number" value="<%= car.price %>" id="price-<%= car._id %>" disabled></td>
+                        <td><input type="number" value="<%= car.manufactureYear %>" id="year-<%= car._id %>" disabled></td>
+                        <td>
+                            <button class="action-btn edit-btn" onclick="toggleEditSave('<%= car._id %>')">Edit</button>
+                            <button class="action-btn delete-btn" onclick="deleteCar('<%= car._id %>')">Delete</button>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function toggleEditSave(carId) {
+            const nameInput = document.getElementById(`name-${carId}`);
+            const modelInput = document.getElementById(`model-${carId}`);
+            const priceInput = document.getElementById(`price-${carId}`);
+            const yearInput = document.getElementById(`year-${carId}`);
+            const editBtn = document.querySelector(`#car-${carId} .edit-btn`);
+
+            if (nameInput.disabled) {
+                // Enable input fields for editing
+                nameInput.disabled = false;
+                modelInput.disabled = false;
+                priceInput.disabled = false;
+                yearInput.disabled = false;
+                editBtn.textContent = "Save"; // Change button text to "Save"
+            } else {
+                // Save the edited data
+                fetch(`/updateCar/${carId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: nameInput.value,
+                        model: modelInput.value,
+                        price: priceInput.value,
+                        manufactureYear: yearInput.value
+                    })
+                }).then(response => {
+                    if (response.ok) {
+                        // Disable input fields after saving
+                        nameInput.disabled = true;
+                        modelInput.disabled = true;
+                        priceInput.disabled = true;
+                        yearInput.disabled = true;
+                        editBtn.textContent = "Edit"; // Change button text back to "Edit"
+                    }
+                }).catch(error => console.error('Error updating car:', error));
+            }
+        }
+
+        function deleteCar(carId) {
+            fetch(`/deleteCar/${carId}`, {
+                method: 'POST'
+            }).then(response => {
+                if (response.ok) {
+                    document.getElementById(`car-${carId}`).remove();
+                }
+            }).catch(error => console.error('Error deleting car:', error));
+        }
+    </script>
+</body>
+</html>
