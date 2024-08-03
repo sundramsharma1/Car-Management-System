@@ -1,12 +1,24 @@
 const mongoose = require("mongoose");
-const connect = mongoose.connect("mongodb+srv://sundramsharma12244:Stark@cluster.snffesp.mongodb.net/car?retryWrites=true&w=majority&appName=Cluster");
-
-connect.then(() => {
-    console.log("Database connected successfully");
-}).catch(() => {
-    console.log("Database cannot be connected");
-});
-
+require('dotenv').config();
+const URI = process.env.MONGODB_URI;
+const connect = mongoose.connect(URI);
+if (!URI) {
+    console.error('MONGODB_URI is not defined');
+    process.exit(1); // Exit the application with an error code
+  }
+  async function connectToDatabase() {
+    try {
+      await mongoose.connect(URI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      });
+      console.log('Database connected successfully');
+    } catch (error) {
+      console.error('Database connection error:', error.message);
+      process.exit(1); 
+    }
+  }
+  connectToDatabase();
 
 const LoginSchema = new mongoose.Schema({
     name: {
