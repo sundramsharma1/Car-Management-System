@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Car Collection</title>
+    <script>
+        if (!userId) {
+            window.location.href = '/Login';
+        }
+    </script>
+    
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -134,10 +140,6 @@
                 </div>
                 <button type="submit" class="submit-btn">Submit</button>
             </form>
-        </div>
-            </form>
-        </div>
-        </form>
     </div>
     <div class="table-container">
         <h2>Car Collection Dashboard</h2>
@@ -218,6 +220,8 @@
                 }
             }).catch(error => console.error('Error deleting car:', error));
         }
+
+        
     </script>
 </body>
 </html>
