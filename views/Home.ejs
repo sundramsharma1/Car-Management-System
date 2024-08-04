@@ -15,6 +15,20 @@
             margin: 0;
             background-color: #f0f0f0;
             padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .logout-btn {
+            position: absolute;
+            top: 40px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
         }
         .form-container, .table-container {
             width: 80%;
@@ -94,6 +108,7 @@
 
 </head>
 <body>
+    <button class="logout-btn" onclick="location.href='/Logout'">Logout</button>
     <div class="form-container">
             <h2>Car Collection</h2>
             <form action="/Home" method="post">

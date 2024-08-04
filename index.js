@@ -11,6 +11,30 @@ app.use(express.urlencoded({ extended: false }));
 app.set('view engine', 'ejs');
 app.use(express.static("public"));
 
+
+//code for express session that is use in middleware for protecting route
+const session = require('express-session');
+
+app.use(session({
+    secret: 'your-secret-key',
+    resave: false,
+    saveUninitialized: false
+}));
+
+
+
+//Code for Middleware to protect route
+function checkAuthenticated(req, res, next) {
+    if (req.session && req.session.userId) {
+        // User is authenticated, proceed to the next middleware/route handler
+        return next();
+    } else {
+        // User is not authenticated, redirect to login page
+        res.redirect('/Login');
+    }
+}
+
+
 // Redirect to Login page initially
 app.get("/", (req, res) => {
     res.redirect("/Login");
@@ -54,6 +78,7 @@ app.post("/Login", async (req, res) => {
     try {
         const user = await SignupModel.findOne({ name: req.body.username }); 
         if (user && await bcrypt.compare(req.body.password, user.password)) {
+            req.session.userId = user._id;
             res.redirect("/Home");
         } else {
             res.send("Invalid username or password");
@@ -64,8 +89,19 @@ app.post("/Login", async (req, res) => {
     }
 });
 
+// Handle Logout request 
+app.get('/Logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            console.log("Error during logout ", err);
+            return res.status(500).send('Error logging out');
+        }
+        res.redirect('/Login');
+    });
+});
+
 // Handle GET request for Home (render and fetch data)
-app.get("/Home", async (req, res) => {
+app.get("/Home", checkAuthenticated, async (req, res) => {
     try {
         const cars = await CarModel.find(); // Fetch all car data
         res.render("Home", { cars }); // Render Home page with car data
